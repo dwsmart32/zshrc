@@ -84,19 +84,23 @@ ln -s "$DOTFILES_DIR/zshrc/.zshrc" ~/.zshrc
 ln -s "$DOTFILES_DIR/tmux/.tmux.conf" ~/.tmux.conf
 echo -e "${GREEN}Symbolic links created.${NC}"
 
-# --- 5. 기본 셸을 Zsh로 변경 ---
-# 컴파일 설치 시 zsh 경로는 $LOCAL_INSTALL_DIR/bin/zsh
-ZSH_PATH=$(command -v zsh)
-if [[ ! "$(echo $SHELL)" == *"zsh"* ]]; then
-    echo -e "${GREEN}Attempting to change default shell to ${ZSH_PATH}...${NC}"
-    if command -v chsh &> /dev/null; then
-        chsh -s "$ZSH_PATH" || echo -e "${YELLOW}'chsh' failed. Using fallback method.${NC}"
-    fi
+# --- 5. 기본 셸을 Zsh로 변경 or fallback ---
+ZSH_PATH=$(command -v zsh || true)
 
-    if [[ ! "$(echo $SHELL)" == *"zsh"* ]]; then
-        echo -e "${YELLOW}Adding 'exec zsh' to ~/.bashrc as a fallback.${NC}"
-        echo 'if [ -t 1 ]; then exec zsh; fi' >> ~/.bashrc
+if [[ -n "$ZSH_PATH" ]]; then
+    echo -e "${GREEN}Zsh found at ${ZSH_PATH}.${NC}"
+    if command -v chsh &> /dev/null; then
+        echo -e "${GREEN}Attempting to change default shell to zsh...${NC}"
+        chsh -s "$ZSH_PATH" || echo -e "${YELLOW}'chsh' failed. Falling back to sourcing .zshrc in bash.${NC}"
+    else
+        echo -e "${YELLOW}'chsh' not available. Falling back to sourcing .zshrc in bash.${NC}"
     fi
+else
+    echo -e "${YELLOW}Zsh not installed, skipping shell change.${NC}"
 fi
 
-echo -e "\n${GREEN}✅ All done! Please log out and log back in to apply all changes.${NC}"
+# --- Fallback: bash에서 항상 .zshrc 불러오기 ---
+if ! grep -q 'source ~/.zshrc' ~/.bashrc; then
+    echo -e "${YELLOW}Adding 'source ~/.zshrc' to ~/.bashrc fallback.${NC}"
+    echo 'if [ -f ~/.zshrc ]; then source ~/.zshrc; fi' >> ~/.bashrc
+fi
