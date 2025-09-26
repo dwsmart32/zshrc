@@ -75,7 +75,24 @@ else
     sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 fi
 
-# ... (이하 플러그인 설치 부분은 동일) ...
+# --- 3-1. Zsh Plugins 설치 ---
+echo -e "${GREEN}Installing Zsh plugins...${NC}"
+mkdir -p "$ZSH_CUSTOM_PLUGINS_DIR"
+
+# zsh-autosuggestions
+if [ ! -d "$ZSH_CUSTOM_PLUGINS_DIR/zsh-autosuggestions" ]; then
+    git clone https://github.com/zsh-users/zsh-autosuggestions "$ZSH_CUSTOM_PLUGINS_DIR/zsh-autosuggestions"
+else
+    echo -e "${YELLOW}zsh-autosuggestions already installed. Skipping.${NC}"
+fi
+
+# zsh-syntax-highlighting
+if [ ! -d "$ZSH_CUSTOM_PLUGINS_DIR/zsh-syntax-highlighting" ]; then
+    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "$ZSH_CUSTOM_PLUGINS_DIR/zsh-syntax-highlighting"
+else
+    echo -e "${YELLOW}zsh-syntax-highlighting already installed. Skipping.${NC}"
+fi
+
 
 # --- 4. 설정 파일 심볼릭 링크 생성 ---
 echo -e "${GREEN}Creating symbolic links for config files...${NC}"
