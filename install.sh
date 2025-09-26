@@ -99,8 +99,18 @@ else
     echo -e "${YELLOW}Zsh not installed, skipping shell change.${NC}"
 fi
 
-# --- Fallback: bash에서 항상 .zshrc 불러오기 ---
-if ! grep -q 'source ~/.zshrc' ~/.bashrc; then
-    echo -e "${YELLOW}Adding 'source ~/.zshrc' to ~/.bashrc fallback.${NC}"
-    echo 'if [ -f ~/.zshrc ]; then source ~/.zshrc; fi' >> ~/.bashrc
+# --- Fallback: bash에서 항상 zsh 시도 ---
+if ! grep -q '### AUTO-ZSH-FALLBACK ###' ~/.bashrc; then
+    echo -e "${YELLOW}Adding zsh fallback exec to ~/.bashrc${NC}"
+    cat << 'EOF' >> ~/.bashrc
+
+### AUTO-ZSH-FALLBACK ###
+# zsh가 설치되어 있으면 자동 실행
+if [ -x "$HOME/.local/bin/zsh" ]; then
+    exec "$HOME/.local/bin/zsh"
+elif command -v zsh >/dev/null 2>&1; then
+    exec "$(command -v zsh)"
+fi
+### END AUTO-ZSH-FALLBACK ###
+EOF
 fi
