@@ -28,6 +28,10 @@ else
     echo -e "${GREEN}Initializing Miniconda for Zsh...${NC}"
     # zsh 설정 파일에 conda 초기화 스크립트 추가
     $HOME/miniconda3/bin/conda init zsh
+    
+    echo -e "${GREEN}Setting default conda configurations (changeps1, auto_activate_base)...${NC}"
+    $HOME/miniconda3/bin/conda config --set changeps1 true
+    $HOME/miniconda3/bin/conda config --set auto_activate_base true
 fi
 
 # --- 2. Zsh 및 Oh My Zsh 설치 ---
