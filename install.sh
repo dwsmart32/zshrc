@@ -61,7 +61,7 @@ else
     echo -e "${GREEN}Initializing Miniconda for Zsh...${NC}"
     $HOME/miniconda3/bin/conda init zsh
 
-    echo -e "${GREEN}Setting default conda configurations...${NC}"
+
     $HOME/miniconda3/bin/conda config --set changeps1 true
     $HOME/miniconda3/bin/conda config --set auto_activate_base true
 fi
