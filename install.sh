@@ -131,3 +131,62 @@ fi
 ### END AUTO-ZSH-FALLBACK ###
 EOF
 fi
+
+
+### theme 설정 바꾸는 코드
+# --- 3-2. af-magic.zsh-theme 교체 ---
+echo -e "${GREEN}Replacing af-magic.zsh-theme with custom version...${NC}"
+cat << 'EOF' > ~/.oh-my-zsh/themes/af-magic.zsh-theme
+# af-magic.zsh-theme
+#
+# Author: Andy Fleming
+# URL: http://andyfleming.com/
+
+# dashed separator size
+function afmagic_dashes {
+  local python_env_dir="${VIRTUAL_ENV:-$CONDA_DEFAULT_ENV}"
+  local python_env="${python_env_dir##*/}"
+
+  if [[ -n "$python_env" && "$PS1" = *\(${python_env}\)* ]]; then
+    echo $(( COLUMNS - ${#python_env} - 3 ))
+  elif [[ -n "$VIRTUAL_ENV_PROMPT" && "$PS1" = *${VIRTUAL_ENV_PROMPT}* ]]; then
+    echo $(( COLUMNS - ${#VIRTUAL_ENV_PROMPT} - 3 ))
+  else
+    echo $COLUMNS
+  fi
+}
+
+PS1="${FG[237]}\${(l.\$(afmagic_dashes)..-.)}%{$reset_color%}
+${FG[032]}%~\$(git_prompt_info)\$(hg_prompt_info) ${FG[105]}%(!.#.»)%{$reset_color%} "
+PS2="%{$fg[red]%}\ %{$reset_color%}"
+
+RPS1="%(?..%{$fg[red]%}%? ↵%{$reset_color%})"
+if (( $+functions[virtualenv_prompt_info] )); then
+  RPS1+='$(virtualenv_prompt_info)'
+fi
+RPS1+=" %{$fg_bold[red]%}%n@%m%{$reset_color%}"
+
+ZSH_THEME_GIT_PROMPT_PREFIX=" ${FG[075]}(${FG[078]}"
+ZSH_THEME_GIT_PROMPT_CLEAN=""
+ZSH_THEME_GIT_PROMPT_DIRTY="${FG[214]}*%{$reset_color%}"
+ZSH_THEME_GIT_PROMPT_SUFFIX="${FG[075]})%{$reset_color%}"
+
+ZSH_THEME_HG_PROMPT_PREFIX=" ${FG[075]}(${FG[078]}"
+ZSH_THEME_HG_PROMPT_CLEAN=""
+ZSH_THEME_HG_PROMPT_DIRTY="${FG[214]}*%{$reset_color%}"
+ZSH_THEME_HG_PROMPT_SUFFIX="${FG[075]})%{$reset_color%}"
+
+ZSH_THEME_VIRTUALENV_PREFIX=" ${FG[075]}["
+ZSH_THEME_VIRTUALENV_SUFFIX="]%{$reset_color%}"
+EOF
+
+# --- 6. zshrc에 conda activate base 추가 ---
+if ! grep -q 'conda activate base' ~/.zshrc; then
+    echo -e "${GREEN}Appending 'conda activate base' to ~/.zshrc${NC}"
+    cat << 'EOF' >> ~/.zshrc
+
+if command -v conda &>/dev/null; then
+    conda activate base
+fi
+EOF
+fi
