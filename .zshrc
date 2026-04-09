@@ -2,7 +2,17 @@
 export ZSH="$HOME/.oh-my-zsh"
 
 # 사용자 로컬 bin 디렉토리 경로 추가
+# export CUDA_HOME=/usr/local/cuda-12.9
+# export PATH="/usr/local/cuda-12.9/bin:$PATH"
+# export LD_LIBRARY_PATH="/usr/local/cuda-12.9/lib64:$LD_LIBRARY_PATH"
+source /etc/profile
+export WANDB_API_KEY='9374baf39e400164b6e1119d3f27748b56ac32c6'
+export CUDA_HOME=/sw/hpc-sdk/Linux_x86_64/25.9/compilers
+export PATH="$CUDA_HOME/bin:$PATH"
+export LD_LIBRARY_PATH="$CUDA_HOME/lib:$CUDA_HOME/lib64:$LD_LIBRARY_PATH"
 export PATH="$HOME/.local/bin:$PATH"
+# export MODULEPATH=/sw/modules/all:/appl/modulefiles:/sw/hpc-sdk/modulefiles # 이거 왜했노? 문제만 되는데
+# source /usr/share/lmod/lmod/init/zsh
 
 # Oh My Zsh 테마
 ZSH_THEME="af-magic"
@@ -23,13 +33,13 @@ alias tmk='tmux kill-session -t'
 alias tmn='tmux new-session -s'
 alias tml='tmux list-sessions' # list-session이 올바른 명령어입니다.
 
-alias vllm='conda activate vllm'
 alias cosyvoice='conda activate cosyvoice'
 alias orpheus2='conda activate orpheus2'
 alias llama-factory='conda activate llama-factory'
 
 alias gpustat='watch -n 1 -c --color $HOME/.config/gpustat_logic.sh' # $HOME 사용
-alias wsqueuemy='watch -n 1 "squeue -o '\''%.10i %.15j %.2t %.10u %.10P %.16q %.12R %.2C %.10b %.8M'\'' -u $USER | nl -v -1"'
+alias wsqueuemy='watch -n 1 "$HOME/.config/squeue_stdout_v1.sh -u $USER"'
+
 
 # --- 함수 (Functions) ---
 squeue() { $HOME/.config/squeue_custom_v1.sh "$@"; } # $HOME 사용
@@ -40,9 +50,10 @@ tunneling() {
     ssh -L "${port_num}":localhost:"${port_num}" -N -f "$(whoami)@${server_name}" # -f로 백그라운드 실행, whoami 사용
 }
 
-wfsqueue () {
-    watch "squeue | grep gpu-farm"
+squeue_stream () {
+    watch -n 1 'squeue -o "%.5i %.10j %.2t %.10u %.10P %.10q %.15R %.3C %.8M %.20b" | nl -v -1'
 }
+
 
 sscancel () {
     scancel $(echo $1 | tr '\n' ' ')
@@ -68,4 +79,4 @@ else
     fi
 fi
 unset __conda_setup
-# <<< conda initialize <<<
+export PATH=$HOME/git-lfs-3.5.1:$PATH
